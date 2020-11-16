@@ -1,0 +1,9 @@
+[submodule "comet-commonsense"]
+	path = comet-commonsense
+	url = https://github.com/byron123t/comet-commonsense.git
+[submodule "VGG-Speaker-Recognition"]
+	path = VGG-Speaker-Recognition
+	url = https://github.com/byron123t/VGG-Speaker-Recognition.git
+[submodule "gpt-2"]
+	path = gpt-2
+	url = https://github.com/byron123t/gpt-2.git

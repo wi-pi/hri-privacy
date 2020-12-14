@@ -1,6 +1,6 @@
 SPEAKERS = {
 	1: 'alice',
-	2: 'alice',
+	2: 'misty',
 	3: 'alice',
 }
 

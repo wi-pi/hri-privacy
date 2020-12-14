@@ -1,8 +1,12 @@
+from data.metadata.topics import TOPICS
+
+
 class Person:
     """
 
     """
-    def __init__(person_id=0,
+    def __init__(self, 
+                 person_id=0,
                  aliases=[],
                  relationships={},
                  topics={},
@@ -13,51 +17,25 @@ class Person:
         self.topics = topics
         self.thresholds = thresholds
 
-
-    def update_relationships(people, trust):
+    def update_relationships(self, people, trust):
         for p, t in zip(people, trust):
             self.relationships[p] = trust
 
-
-    def update_topics(topics, scores):
+    def update_topics(self, topics, scores):
         for t, s in zip(topics, scores):
             self.topics[t] = s
 
-
-    def update_thresholds(control_levels, thresholds):
+    def update_thresholds(self, control_levels, thresholds):
         for c, t in zip(control_levels, thresholds):
             self.thresholds[c] = t
 
 
-TOPICS = {
-    0: 1.0,
-    1: 0.1,
-    2: 0.3,
-    3: 0.3,
-    4: 0.1,
-    5: 0.4,
-    6: 0.3,
-    7: 0.7,
-    8: 0.1,
-    9: 0.2,
-    10: 0.9,
-    11: 0.2,
-    12: 0.2,
-    13: 0.2,
-    14: 0.2,
-    15: 0.3,
-    16: 0.1,
-    17: 0.2,
-    18: 0.2,
-    19: 0.1,
-    20: 0.3,
-    21: 0.3,
-    22: 0.2,
-    23: 1.0,
-    24: 0.2,
-    25: 0.1,
-    26: 0.2,
-}
+def get_person(people, alias):
+    for person in people:
+        if alias in person.aliases:
+            return person.person_id
+    return None
+
 
 PEOPLE = {
     1:Person(person_id=1,

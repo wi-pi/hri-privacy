@@ -1,94 +1,69 @@
 from google.cloud import language_v1
+import os
 
 
-def iterate_entities(response):
-	for entity in response.entities:
-	    print(u"Representative name for the entity: {}".format(entity.name))
+class Google_NLP:
 
-	    # Get entity type, e.g. PERSON, LOCATION, ADDRESS, NUMBER, et al
-	    print(u"Entity type: {}".format(language_v1.Entity.Type(entity.type_).name))
+    def __init__(self, text):
+        self.client = language_v1.LanguageServiceClient()
+        self.language = "en"
 
-	    # Get the salience score associated with the entity in the [0, 1.0] range
-	    print(u"Salience score: {}".format(entity.salience))
+        print("Text: {}".format(text))
+        self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)
 
-	    # Loop over the metadata associated with entity. For many known entities,
-	    # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
-	    # Some entity types may have additional metadata, e.g. ADDRESS entities
-	    # may have metadata for the address street_name, postal_code, et al.
-	    for metadata_name, metadata_value in entity.metadata.items():
-	        print(u"{}: {}".format(metadata_name, metadata_value))
+    def get_entity_sentiment(self):
+        """
+        Analyzing Entity Sentiment in a String
 
-	    # Loop over the mentions of this entity in the input document.
-	    # The API currently supports proper noun mentions.
-	    for mention in entity.mentions:
-	        print(u"Mention text: {}".format(mention.text.content))
+        Args:
+          text_content The text content to analyze
+        """
+        response = self.client.analyze_entity_sentiment(request={'document': self.document})
+        entities = []
+        for entity in response.entities:
+            e_name = entity.name
+            e_type = language_v1.Entity.Type(entity.type_).name
+            e_salience = entity.salience
+            e_sentiment_score = entity.sentiment.score
+            e_sentiment_magnitude = entity.sentiment.magnitude
 
-	        # Get the mention type, e.g. PROPER for proper noun
-	        print(
-	            u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name)
-	        )
+            print(u"Representative name for the entity: {}".format(e_name))
+            print(u"Entity type: {}".format(e_type))
+            print(u"Salience score: {}".format(e_salience))
+            print(u"Entity sentiment score: {}".format(e_sentiment_score))
+            print(u"Entity sentiment magnitude: {}".format(e_sentiment_magnitude))
 
-	# Get the language of the text, which will be the same as
-	# the language specified in the request or, if not specified,
-	# the automatically-detected language.
-	print(u"Language of the text: {}".format(response.language))
+            e_metadata = {}
+            for metadata_name, metadata_value in entity.metadata.items():
+                print(u"{} = {}".format(metadata_name, metadata_value))
+                emetadata[metadata_name] = metadata_value
 
-
-def iterate_entity_sentiment(response):
-    """
-    Analyzing Entity Sentiment in a String
-
-    Args:
-      text_content The text content to analyze
-    """
-
-    for entity in response.entities:
-        print(u"Representative name for the entity: {}".format(entity.name))
-        # Get entity type, e.g. PERSON, LOCATION, ADDRESS, NUMBER, et al
-        print(u"Entity type: {}".format(language_v1.Entity.Type(entity.type_).name))
-        # Get the salience score associated with the entity in the [0, 1.0] range
-        print(u"Salience score: {}".format(entity.salience))
-        # Get the aggregate sentiment expressed for this entity in the provided document.
-        sentiment = entity.sentiment
-        print(u"Entity sentiment score: {}".format(sentiment.score))
-        print(u"Entity sentiment magnitude: {}".format(sentiment.magnitude))
-        # Loop over the metadata associated with entity. For many known entities,
-        # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
-        # Some entity types may have additional metadata, e.g. ADDRESS entities
-        # may have metadata for the address street_name, postal_code, et al.
-        for metadata_name, metadata_value in entity.metadata.items():
-            print(u"{} = {}".format(metadata_name, metadata_value))
-
-        # Loop over the mentions of this entity in the input document.
-        # The API currently supports proper noun mentions.
-        for mention in entity.mentions:
-            print(u"Mention text: {}".format(mention.text.content))
-            # Get the mention type, e.g. PROPER for proper noun
-            print(
-                u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name)
-            )
-
-    # Get the language of the text, which will be the same as
-    # the language specified in the request or, if not specified,
-    # the automatically-detected language.
-    print(u"Language of the text: {}".format(response.language))
+            e_mention = ''
+            e_mentiontype = ''
+            for mention in entity.mentions:
+                print(u"Mention text: {}".format(mention.text.content))
+                print(u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name))
+                e_mention += mention.text.content
+                e_mention_type += language_v1.EntityMention.Type(mention.type_).name
 
 
-client = language_v1.LanguageServiceClient()
-with open('sample2.txt', 'r') as infile:
-	text = infile.read()
-language = "en"
-document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=language)
-# sentiment = client.analyze_sentiment(request={'document': document})
-# topic = client.classify_text(request={'document': document})
-# response = client.analyze_entities(request={'document': document})
-# response = client.analyze_entity_sentiment(request={'document': document})
+            e = {'representation': e_name,
+                 'type': e_type,
+                 'salience': e_salience,
+                 'mention_text': e_mention,
+                 'mention_type': e_mention_type,
+                 'sentiment_score': e_sentiment_score,
+                 'sentiment_magnitude': e_sentiment_magnitude}
+            e.update(e_metadata)
+            entities.append(e)
+        return entities
 
+    def get_sentiment(self):
+        return self.client.analyze_sentiment(request={'document': self.document})
 
-print("Text: {}".format(text))
-# Score < 0 is negative, > 0 is positive, around 0 is neutral
-# Magnitude around 0 is neutral, the higher is more emotion expression
-# print(sentiment)
-# print(topic)
-# iterate_entities(response)
-# iterate_entity_sentiment(response)
+    def get_topic(self):
+        return self.client.classify_text(request={'document': self.document}).split('/')[1]
+
+    def update_document(self, text):
+        print("Text: {}".format(text))
+        self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)

@@ -1,8 +1,24 @@
-SPEAKERS = {
-	1: 'alice',
-	2: 'misty',
-	3: 'alice',
+from datetime import datetime, timedelta
+from data.metadata.conversation import Information
+
+
+speakers = {
+    1: 'alice',
+    2: 'misty',
+    3: 'alice',
 }
 
-LISTENERS = ['alice', 'misty']
-TOPICS = ['Sensitive Subjects', 'Finance']
+listeners = ['alice', 'misty']
+
+topics = ['Sensitive Subjects', 'Finance']
+
+timestamps = {
+    1: datetime.utcnow(),
+    2: datetime.utcnow() + timedelta(seconds=5),
+    3: datetime.utcnow() + timedelta(seconds=10),
+}
+
+INFO3 = Information(speakers=speakers,
+                   listeners=listeners,
+                   topics=topics,
+                   timestamps=timestamps)

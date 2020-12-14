@@ -1,56 +1,57 @@
-def convert_rule():
-    """
-    Converts a string into a privacy rule.
+class Rules:
+    self.RULES = {
+        'topic': enforce_topic,
+        'sentiment': enforce_sentiment,
+        'relationship': enforce_relationship,
+        'threshold': enforce_threshold,
+        'indication': enforce_privacy_indication
+    }
+    def __init__(self, rules):
+        self.rules = rules
 
-    Keyword arguments:
-    param -- description
-    """
+    def enforce(self, data):
+        for r in self.rules:
+            self.RULES[r](data)
+            
+    def enforce_topic(data):
+        """
+        Enforces privacy based on conversation topics.
 
+        Keyword arguments:
+        param -- description
+        """
 
-def enforce_topic():
-    """
-    Enforces privacy based on conversation topics.
+    def enforce_sentiment(data):
+        """
+        Enforces privacy based on negative sentiments.
 
-    Keyword arguments:
-    param -- description
-    """
+        Keyword arguments:
+        param -- description
+        """
 
+    def enforce_relationship(data):
+        """
+        Enforces privacy based on relationship closeness.
 
-def enforce_sentiment():
-    """
-    Enforces privacy based on negative sentiments.
+        Keyword arguments:
+        param -- description
+        """
 
-    Keyword arguments:
-    param -- description
-    """
+    def enforce_threshold(data):
+        """
+        Enforces privacy threshold rule based on:
+            Number of people involved.
+            How detailed information is.
+            Relationship scores between people.
 
+        Keyword arguments:
+        param -- description
+        """
 
-def enforce_relationship():
-    """
-    Enforces privacy based on relationship closeness.
+    def enforce_privacy_indication(data):
+        """
+        description
 
-    Keyword arguments:
-    param -- description
-    """
-
-
-def enforce_threshold():
-    """
-    Enforces privacy threshold rule based on:
-        Number of people involved.
-        How detailed information is.
-        Relationship scores between people.
-
-    Keyword arguments:
-    param -- description
-    """
-
-
-def enforce_privacy_indication():
-    """
-    description
-
-    Keyword arguments:
-    param -- description
-    """
-
+        Keyword arguments:
+        param -- description
+        """

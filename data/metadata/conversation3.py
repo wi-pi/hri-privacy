@@ -1,7 +1,3 @@
-from datetime import datetime, timedelta
-from data.metadata.conversation import Information
-
-
 speakers = {
     1: 'alice',
     2: 'misty',

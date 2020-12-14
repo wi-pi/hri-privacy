@@ -1,5 +1,5 @@
-from google.cloud import language_v1
 import os
+from google.cloud import language_v1
 
 
 class Google_NLP:

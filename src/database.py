@@ -1,7 +1,6 @@
 import psycopg2
-from datetime import datetime
 from psycopg2.sql import SQL, Identifier
-from pgcopy import CopyManager
+from datetime import datetime
 
 import config
 

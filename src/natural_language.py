@@ -13,10 +13,7 @@ class Google_NLP:
 
     def get_entity_sentiment(self):
         """
-        Analyzing Entity Sentiment in a String
-
-        Args:
-          text_content The text content to analyze
+        Get sentiments, salience, metadata for each entity in the document
         """
         response = self.client.analyze_entity_sentiment(request={'document': self.document})
         entities = []
@@ -33,6 +30,7 @@ class Google_NLP:
             print(u"Entity sentiment score: {}".format(e_sentiment_score))
             print(u"Entity sentiment magnitude: {}".format(e_sentiment_magnitude))
 
+            # Metadata includes Wikipedia links and MIDs
             e_metadata = {}
             for metadata_name, metadata_value in entity.metadata.items():
                 print(u"{} = {}".format(metadata_name, metadata_value))
@@ -59,9 +57,15 @@ class Google_NLP:
         return entities
 
     def get_sentiment(self):
+        """
+        Get sentiment score and magnitude of document
+        """
         return self.client.analyze_sentiment(request={'document': self.document})
 
     def get_topic(self):
+        """
+        Get document category classification from a set of topics
+        """
         return self.client.classify_text(request={'document': self.document}).split('/')[1]
 
     def update_document(self, text):

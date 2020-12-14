@@ -1,6 +1,6 @@
 def test_coordinated():
     """
-    description
+    Evaluate when privacy boundaries are coordinated
 
     Keyword arguments:
     param -- description
@@ -8,7 +8,7 @@ def test_coordinated():
 
 def test_disjointed():
     """
-    description
+    Evaluate when privacy boundaries are unsynched
 
     Keyword arguments:
     param -- description
@@ -16,7 +16,7 @@ def test_disjointed():
 
 def test_contradiction():
     """
-    description
+    Evaluate when privacy boundary rules are contradictory
 
     Keyword arguments:
     param -- description
@@ -24,7 +24,7 @@ def test_contradiction():
 
 def test_ignore():
     """
-    description
+    Evaluate when privacy boundaries are ignored
 
     Keyword arguments:
     param -- description

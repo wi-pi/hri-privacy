@@ -2,9 +2,6 @@ from data.metadata.topics import TOPICS
 
 
 class Person:
-    """
-
-    """
     def __init__(self, 
                  person_id=0,
                  aliases=[],

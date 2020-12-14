@@ -7,3 +7,6 @@
 [submodule "gpt-2"]
 	path = gpt-2
 	url = https://github.com/byron123t/gpt-2.git
+[submodule "emotion-recognition-using-speech"]
+	path = emotion-recognition-using-speech
+	url = https://github.com/byron123t/emotion-recognition-using-speech.git

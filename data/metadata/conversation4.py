@@ -3,18 +3,14 @@ from src.conversation import Information
 
 
 speakers = {
-    1: 'alice',
-    2: 'bob',
-    3: 'alice',
-    4: 'bob',
-    5: 'eve',
-    6: 'charlie',
-    7: 'alice',
+    1: 'bob',
+    2: 'misty',
+    3: 'bob',
 }
 
-listeners = ['alice', 'bob', 'charlie', 'eve', 'misty']
+listeners = ['bob', 'misty']
 
-topics = ['Beauty & Fitness']
+topics = ['Sensitive Subjects', 'Finance']
 
 timestamps = {
     1: datetime.utcnow(),
@@ -22,11 +18,9 @@ timestamps = {
     3: datetime.utcnow() + timedelta(seconds=10),
     4: datetime.utcnow() + timedelta(seconds=15),
     5: datetime.utcnow() + timedelta(seconds=20),
-    6: datetime.utcnow() + timedelta(seconds=25),
-    7: datetime.utcnow() + timedelta(seconds=30),
 }
 
-INFO1 = Information(speakers=speakers,
+INFO3 = Information(speakers=speakers,
                    listeners=listeners,
                    topics=topics,
                    timestamps=timestamps)

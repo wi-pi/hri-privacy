@@ -1,3 +1,7 @@
+from datetime import datetime, timedelta
+from src.conversation import Information
+
+
 speakers = {
     1: 'alice',
     2: 'misty',

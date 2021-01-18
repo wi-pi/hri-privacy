@@ -21,23 +21,24 @@ class Google_NLP:
             e_name = entity.name
             e_type = language_v1.Entity.Type(entity.type_).name
             e_salience = entity.salience
-            e_sentiment_score = entity.sentiment.score
-            e_sentiment_magnitude = entity.sentiment.magnitude
+            e_sentiment = entity.sentiment
 
             print(u"Representative name for the entity: {}".format(e_name))
             print(u"Entity type: {}".format(e_type))
             print(u"Salience score: {}".format(e_salience))
-            print(u"Entity sentiment score: {}".format(e_sentiment_score))
-            print(u"Entity sentiment magnitude: {}".format(e_sentiment_magnitude))
+            print(u"Entity sentiment score: {}".format(e_sentiment.score))
+            print(u"Entity sentiment magnitude: {}".format(e_sentiment.magnitude))
 
             # Metadata includes Wikipedia links and MIDs
             e_metadata = {}
+            e_metadata['wiki_url'] = 'none'
+            e_metadata['knowledge_mid'] = 'none'
             for metadata_name, metadata_value in entity.metadata.items():
                 print(u"{} = {}".format(metadata_name, metadata_value))
-                emetadata[metadata_name] = metadata_value
+                e_metadata[metadata_name] = metadata_value
 
             e_mention = ''
-            e_mentiontype = ''
+            e_mention_type = ''
             for mention in entity.mentions:
                 print(u"Mention text: {}".format(mention.text.content))
                 print(u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name))
@@ -47,11 +48,10 @@ class Google_NLP:
 
             e = {'representation': e_name,
                  'type': e_type,
-                 'salience': e_salience,
+                 'salience_score': e_salience,
                  'mention_text': e_mention,
                  'mention_type': e_mention_type,
-                 'sentiment_score': e_sentiment_score,
-                 'sentiment_magnitude': e_sentiment_magnitude}
+                 'sentiment': e_sentiment}
             e.update(e_metadata)
             entities.append(e)
         return entities
@@ -60,13 +60,13 @@ class Google_NLP:
         """
         Get sentiment score and magnitude of document
         """
-        return self.client.analyze_sentiment(request={'document': self.document})
+        return self.client.analyze_sentiment(request={'document': self.document}).document_sentiment
 
     def get_topic(self):
         """
         Get document category classification from a set of topics
         """
-        return self.client.classify_text(request={'document': self.document}).split('/')[1]
+        return self.client.classify_text(request={'document': self.document})
 
     def update_document(self, text):
         print("Text: {}".format(text))

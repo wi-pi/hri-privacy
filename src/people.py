@@ -28,7 +28,7 @@ class Person:
 
 
 def get_person(people, alias):
-    for person in people:
+    for i, person in people.items():
         if alias in person.aliases:
             return person.person_id
     return None

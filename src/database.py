@@ -2,7 +2,42 @@ import psycopg2
 from psycopg2.sql import SQL, Identifier
 from datetime import datetime
 
-import config
+from data import config
+
+
+def format_cols(cols, insert=False):
+    if insert:
+        columns = '('
+        args = '('
+    else:
+        columns = ''
+        args = ''
+    for i, name in enumerate(cols):
+        columns += name
+        args += '%s'
+        if i < len(cols) - 1:
+            columns += ', '
+            args += ', '
+    if insert:
+        columns += ')'
+        args += ')'
+    return columns, args
+
+
+def format_where(cols):
+    where = ''
+    for i, name in enumerate(cols):
+        where += '{} IN %s'.format(name)
+        if i < len(cols) - 1:
+            where += ' AND '
+    return where
+
+
+def format_data(data):
+    new_data = []
+    for i in data:
+        new_data.append(tuple(i))
+    return new_data
 
 
 class Database:
@@ -13,7 +48,7 @@ class Database:
                                      password=config.PASSWORD,
                                      host=config.HOSTNAME)
 
-    def add_people(self, people):
+    def do(self, sql=None, data=None, file=None, verbose=False):
         """
         description
 
@@ -21,117 +56,65 @@ class Database:
         param -- description
         """
         cur = self.conn.cursor()
-        for person in people:
-            cur.execute(SQL('INSERT INTO person (person_id, aliases) \
-                VALUES ({}, {})').format(person.person_id, person.aliases))
-        for person in people:
-            for p, trust in person.relationships.items():
-                cur.execute(SQL('INSERT INTO person_trust (truster_id, trustee_id, trust) \
-                 VALUES ({}, {}, {})').format(person.person_id, p, trust))
+        if verbose:
+            print(cur.mogrify(sql, data))
+        if file is not None:
+            cur.execute(open(file, 'r').read())
+        else:
+            if data is not None:
+                cur.execute(sql, data)
+            else:
+                cur.execute(sql)
+        self.conn.commit()
+        try:
+            temp = cur.fetchall()
+            if len(temp) == 0:
+                out = None
+            else:
+                out = []
+                if len(temp[0]) == 1:
+                    for i in temp:
+                        out.append(i[0])
+                else:
+                    out = temp
+        except psycopg2.ProgrammingError:
+            out = None
         cur.close()
+        if verbose:
+            print(out)
+        return out
 
-    def add_information(self, topics, eavesdropping, timestamp, sentiment):
-        """
-        description
+    def insert(self, table, cols, data):
+        columns, args = format_cols(cols, insert=True)
+        sql = 'INSERT INTO {} {} VALUES {} ON CONFLICT DO NOTHING'.format(table, columns, args)
+        self.do(sql, data)
 
-        Keyword arguments:
-        param -- description
-        """
-        cur = self.conn.cursor()
-        cur.execute(SQL('INSERT INTO information (topics, eavesdropping, datetime, sentiment_score, sentiment_magnitude) \
-            VALUES ({}, {}, {}, {}, {})').format(topics, eavesdropping, timestamp, sentiment.score, sentiment.magnitude))
-        cur.close()
+    def select(self, table, cols, conds=None, data=None):
+        columns, _ = format_cols(cols)
+        if conds is not None:
+            where = format_where(conds)
+            sql = 'SELECT {} FROM {} WHERE {}'.format(columns, table, where)
+        else:
+            sql = 'SELECT {} FROM {}'.format(columns, table)
+        return self.do(sql, format_data(data))
 
-    def add_person_information(self, conversation, listeners):
-        """
-        description
+    def update(self, table, cols, conds, data):
+        columns, args = format_cols(cols)
+        where = format_where(conds)
+        sql = 'UPDATE {} SET {} = {} WHERE {}'.format(table, columns, args, where)
+        self.do(sql, format_data(data))
 
-        Keyword arguments:
-        param -- description
-        """
-        cur = self.conn.cursor()
-        for person in listeners:
-            cur.execute(SQL('INSERT INTO person_information (person_id, information_id) \
-                VALUES ({}, {})').format(person, conversation))
-        cur.close()
+    def delete_all(self):
+        self.do(sql='DROP TABLE IF EXISTS content CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS entities CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS information CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS person CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS topic CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS person_content CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS person_information CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS person_trust CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS person_topic CASCADE;')
+        self.do(sql='DROP TABLE IF EXISTS information_topic CASCADE;')
 
-    def add_person_content(self, content, listeners):
-        """
-        description
-
-        Keyword arguments:
-        param -- description
-        """
-        cur = self.conn.cursor()
-        for person in listeners:
-            cur.execute(SQL('INSERT INTO person_content (person_id, content_id) \
-                VALUES ({}, {})').format(person, content))
-        cur.close()
-
-    def add_content(self, data):
-        """
-        description
-
-        Keyword arguments:
-        param -- description
-        """
-        cur = self.conn.cursor()
-
-        cur.execute(SQL('INSERT INTO content (speaker_id, information_id, addressee_id, position, text_content, emotion, \
-            sentiment_score, sentiment_magnitude, privacy_score, datetime, intent, privacy_indication) \
-            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})').format(data['speaker_id'],
-                                                                             data['information_id'],
-                                                                             data['addressee_id'],
-                                                                             data['position'],
-                                                                             data['text_content'],
-                                                                             data['emotion'],
-                                                                             data['sentiment_score'],
-                                                                             data['sentiment_magnitude'],
-                                                                             data['privacy_score'],
-                                                                             data['datetime'],
-                                                                             data['intent'],
-                                                                             data['privacy_indication']))
-        cur.close()
-
-    def add_entity(self, data):
-        """
-        description
-
-        Keyword arguments:
-        param -- description
-        """
-        cur = self.conn.cursor()
-
-        cur.execute(SQL('INSERT INTO entities (content_id, representation, mention_text, type, mention_type, wiki_url, \
-            knowledge_mid, currency, value, salience_score, sentiment_score, sentiment_magnitude) \
-            VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})').format(data['content_id'],
-                                                                             data['representation'],
-                                                                             data['mention_text'],
-                                                                             data['type'],
-                                                                             data['mention_type'],
-                                                                             data['wiki_url'],
-                                                                             data['knowledge_mid'],
-                                                                             data['currency'],
-                                                                             data['value'],
-                                                                             data['salience_score'],
-                                                                             data['sentiment_score'],
-                                                                             data['sentiment_magnitude']))
-        cur.close()
-
-    def update_(self, ):
-        """
-        description
-
-        Keyword arguments:
-        param -- description
-        """
-
-
-    def get_(self, ):
-        """
-        description
-
-        Keyword arguments:
-        param -- description
-        """
-
+    def create_all(self):
+        self.do(file='data/create_tables.sql')

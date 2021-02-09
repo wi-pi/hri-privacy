@@ -42,6 +42,44 @@ class Rules:
         print('{} - {} - {} - {}'.format(control, avg, threshold_low, threshold_high))
         self.DB.update_privacy(avg, control, person_id, content_id)
 
+    def update_trust(self):
+        """
+        Updates trust score based on:
+            Number of conversations had with each other. 1/3
+            Level of detail of conversations. 1/3
+            Privacy level of conversations. 1/3
+
+        Keyword arguments:
+        param -- description
+        """
+        people = self.DB.get_person_id()
+        for p1 in people:
+            for p2 in people:
+                if p1 != p2:
+                    text_content, privacy_score, control_level = self.DB.get_peoples_conversations(p1, p2)
+                    detail = 0
+                    privacy = 0
+                    conversations = 0
+                    total = len(text_content)
+                    for i, t in enumerate(text_content):
+                        detail += len(t) / total
+                        if privacy_score[i] >= 0:
+                            privacy += privacy_score[i] / total
+                        if control_level[i] == 'low':
+                            conversations += 0 / total
+                        elif control_level[i] == 'moderate':
+                            conversations += 0.5 / total
+                        elif control_level[i] == 'high':
+                            conversations += 1 / total
+                    if detail < 100:
+                        score = 0
+                    elif detail < 500:
+                        score = 0.5
+                    else:
+                        score = 1
+                    trust = score + conversations + privacy / 3
+                    self.DB.update_trust(p1, p2, trust)
+
     def enforce_topic(self, content_id, person_id):
         """
         Enforces privacy threshold rule based on:
@@ -88,7 +126,7 @@ class Rules:
         trusts = self.DB.get_relationships(content_id, person_id)
         score = 0
         for i in trusts:
-            score += (1 - i[1])
+            score += (i[1])
         score /= len(trusts)
         return score
 

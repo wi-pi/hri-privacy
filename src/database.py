@@ -34,6 +34,8 @@ def format_where(cols):
 
 
 def format_data(data):
+    if data is None:
+        return None
     new_data = []
     for i in data:
         new_data.append(tuple(i))

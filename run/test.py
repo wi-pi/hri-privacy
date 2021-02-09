@@ -44,7 +44,8 @@ def test(content_id, person_id):
         'information_detail': 1,
     }
     r = Rules(weights)
-    r.enforce(content_id, person_id)
+    r.update_trust()
+    # r.enforce(content_id, person_id)
 
 
 def test_loop():

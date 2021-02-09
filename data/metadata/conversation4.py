@@ -3,12 +3,15 @@ from src.conversation import Information
 
 
 speakers = {
-    1: 'bob',
-    2: 'misty',
-    3: 'bob',
+    1: 'Dolly',
+    2: 'Dolly',
+    3: 'Dolly',
+    1: 'Dolly',
+    2: 'Dolly',
+    3: 'Dolly',
 }
 
-listeners = ['bob', 'misty']
+listeners = ['Dolly', 'misty']
 
 topics = ['Sensitive Subjects', 'Finance']
 

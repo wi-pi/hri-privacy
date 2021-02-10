@@ -6,6 +6,13 @@ from data import config
 
 
 def format_cols(cols, insert=False):
+    """
+    Formats the columns for selection or insertion.
+
+    Keyword arguments:
+    cols -- The list of column names.
+    insert -- True uses parenthesis. False does not.
+    """
     if insert:
         columns = '('
         args = '('
@@ -25,6 +32,12 @@ def format_cols(cols, insert=False):
 
 
 def format_where(cols):
+    """
+    Formats the conditional block for selection or updating.
+
+    Keyword arguments:
+    cols -- The list of column names used in the where clause. Does not include data.
+    """
     where = ''
     for i, name in enumerate(cols):
         where += '{} IN %s'.format(name)
@@ -34,6 +47,12 @@ def format_where(cols):
 
 
 def format_data(data):
+    """
+    Formats the data into a tuple for insertion, selection, and updating.
+
+    Keyword arguments:
+    data -- The list of data points.
+    """
     if data is None:
         return None
     new_data = []
@@ -43,7 +62,9 @@ def format_data(data):
 
 
 class Database:
-
+    """
+    The database class responsible for opening connections, executing, and fetching.
+    """
     def __init__(self):
         self.conn = psycopg2.connect(dbname=config.DB_NAME,
                                      user=config.USERNAME,
@@ -52,10 +73,13 @@ class Database:
 
     def do(self, sql=None, data=None, file=None, verbose=False):
         """
-        description
+        Executes an SQL statement and returns the fetched data.
 
         Keyword arguments:
-        param -- description
+        sql -- The SQL string to execute.
+        data -- The data to pass in for insertion/selection/updating.
+        file -- The SQL file to execute. This overwrites the sql and data parameters.
+        verbose -- Whether or not to print the SQL statments and results with each function call.
         """
         cur = self.conn.cursor()
         if verbose:
@@ -87,11 +111,28 @@ class Database:
         return out
 
     def insert(self, table, cols, data):
+        """
+        Constructs an insertion SQL string.
+
+        Keyword arguments:
+        table -- The name of the table to insert into.
+        cols -- The column names of data to insert.
+        data -- The actual data to insert into the database.
+        """
         columns, args = format_cols(cols, insert=True)
         sql = 'INSERT INTO {} {} VALUES {} ON CONFLICT DO NOTHING'.format(table, columns, args)
         self.do(sql, data)
 
     def select(self, table, cols, conds=None, data=None):
+        """
+        Constructs a selection SQL string.
+
+        Keyword arguments:
+        table -- The name of the table to select from.
+        cols -- The column names of data to select.
+        conds -- The condition column names used in the where clause.
+        data -- The conditional data used in the where clause.
+        """
         columns, _ = format_cols(cols)
         if conds is not None:
             where = format_where(conds)
@@ -101,6 +142,15 @@ class Database:
         return self.do(sql, format_data(data))
 
     def update(self, table, cols, conds, data):
+        """
+        Constructs an update SQL string.
+
+        Keyword arguments:
+        table -- The name of the table to update.
+        cols -- The column names of data to update.
+        conds -- The condition column names used in the where clause.
+        data -- The conditional data used in the where clause.
+        """
         columns, args = format_cols(cols)
         where = format_where(conds)
         sql = 'UPDATE {} SET {} = {} WHERE {}'.format(table, columns, args, where)

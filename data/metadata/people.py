@@ -1,6 +1,8 @@
 from data.metadata.topics import TOPICS
 from src.people import Person
 
+# TODO: automate the relationship graph creation using the trust updater.
+
 PEOPLE = {
     1:Person(person_id=1,
            aliases=['alice'],

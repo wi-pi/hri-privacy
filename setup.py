@@ -3,7 +3,6 @@ from setuptools import setup
 
 setup(name='socionormbot',
 	  version='1.0',
-	  # url='https://github.com/bjtang2/faceoff',
 	  license='MIT',
 	  install_requires=[
 	  ],

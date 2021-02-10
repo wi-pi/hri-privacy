@@ -3,7 +3,9 @@ from google.cloud import language_v1
 
 
 class Google_NLP:
-
+    """
+    Google natural language API class. Can be used to get metadata such as entities, sentiments, and topics from a specified document.
+    """
     def __init__(self, text):
         self.client = language_v1.LanguageServiceClient()
         self.language = "en"
@@ -11,9 +13,25 @@ class Google_NLP:
         print("Text: {}".format(text))
         self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)
 
+    def update_document(self, text):
+        print("Text: {}".format(text))
+        self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)
+        
+    def get_sentiment(self):
+        """
+        Get sentiment score and magnitude of document.
+        """
+        return self.client.analyze_sentiment(request={'document': self.document}).document_sentiment
+
+    def get_topic(self):
+        """
+        Get document category classification from a set of topics.
+        """
+        return self.client.classify_text(request={'document': self.document})
+
     def get_entity_sentiment(self):
         """
-        Get sentiments, salience, metadata for each entity in the document
+        Get sentiments, salience, metadata for each entity in the document.
         """
         response = self.client.analyze_entity_sentiment(request={'document': self.document})
         entities = []
@@ -56,18 +74,3 @@ class Google_NLP:
             entities.append(e)
         return entities
 
-    def get_sentiment(self):
-        """
-        Get sentiment score and magnitude of document
-        """
-        return self.client.analyze_sentiment(request={'document': self.document}).document_sentiment
-
-    def get_topic(self):
-        """
-        Get document category classification from a set of topics
-        """
-        return self.client.classify_text(request={'document': self.document})
-
-    def update_document(self, text):
-        print("Text: {}".format(text))
-        self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)

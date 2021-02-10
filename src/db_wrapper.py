@@ -2,10 +2,19 @@ from src.database import Database
 
 
 class DatabaseWrapper:
+    """
+    An wrapper for all task specific database queries.
+    """
     def __init__(self):
         self.DB = Database()
 
     def add_people(self, people):
+        """
+        Adds a set of people to the person table.
+
+        Keyword arguments:
+        people -- A list of Person classes.
+        """
         table = 'person'
         cols = ['person_id', 'threshold_low', 'threshold_high', 'aliases']
         for person_id, person in people.items():
@@ -23,6 +32,12 @@ class DatabaseWrapper:
                                              trust))
 
     def add_information(self, data):
+        """
+        Adds a conversation to the information table.
+
+        Keyword arguments:
+        data -- A dict containing the data below.
+        """
         table = 'information'
         cols = ['information_id', 'eavesdropping', 'datetime', 'sentiment_score', 'sentiment_magnitude', \
             'threshold_low', 'threshold_high']
@@ -35,12 +50,25 @@ class DatabaseWrapper:
                                      data['threshold_high']))
 
     def add_topic(self, data):
+        """
+        Adds a topic to the topic table.
+
+        Keyword arguments:
+        data -- A dict containing the data below.
+        """
         table = 'topic'
         cols = ['topic_id', 'name']
         self.DB.insert(table, cols, (data['topic_id'],
                                      data['name']))
 
     def add_person_information(self, information_id, listeners):
+        """
+        Adds the relationships of people to conversations to the person_information table.
+
+        Keyword arguments:
+        information_id -- The conversation ID.
+        listeners -- The list of conversation listeners.
+        """
         table = 'person_information'
         cols = ['person_id', 'information_id']
         for person in listeners:
@@ -48,6 +76,14 @@ class DatabaseWrapper:
                                          information_id))
 
     def add_person_content(self, content, listeners, control_level):
+        """
+        Adds the relationships of people to conversation contents to the person_content table.
+
+        Keyword arguments:
+        content -- The content ID.
+        listeners -- The list of conversation listeners.
+        control_level -- The control level of the specific person-content pair.
+        """
         table = 'person_content'
         cols = ['person_id', 'content_id', 'control_level']
         for person in listeners:
@@ -56,6 +92,14 @@ class DatabaseWrapper:
                                          control_level))
 
     def add_person_topic(self, people, topics, topic_ids):
+        """
+        Adds a set of people to the Person table.
+
+        Keyword arguments:
+        people -- The dictionary of all people.
+        topics -- The dictionary of all topics.
+        topic_ids -- The dictionary of all topic IDs.
+        """
         table = 'person_topic'
         cols = ['person_id', 'topic_id', 'score']
         for key, person in people.items():
@@ -65,6 +109,13 @@ class DatabaseWrapper:
                                              score))
 
     def add_information_topic(self, information_id, topics):
+        """
+        Adds a set of people to the Person table.
+
+        Keyword arguments:
+        information_id -- The conversation ID.
+        topics -- The topic IDs associated with the conversation.
+        """
         table = 'information_topic'
         cols = ['information_id', 'topic_id']
         for topic in topics:
@@ -72,6 +123,12 @@ class DatabaseWrapper:
                                          topic))
 
     def add_content(self, data):
+        """
+        Adds a set of people to the Person table.
+
+        Keyword arguments:
+        data -- A dict containing the data below.
+        """
         table = 'content'
         cols = ['speaker_id', 'information_id', 'addressee_id', 'position', 'text_content', 'emotion', \
             'sentiment_score', 'sentiment_magnitude', 'privacy_score', 'datetime', 'intent', 'privacy_indication']
@@ -89,6 +146,12 @@ class DatabaseWrapper:
                                      data['privacy_indication']))
 
     def add_entity(self, data):
+        """
+        Adds a set of people to the Person table.
+
+        Keyword arguments:
+        data -- A dict containing the data below.
+        """
         table = 'entities'
         cols = ['content_id', 'representation', 'mention_text', 'type', 'mention_type', 'wiki_url', \
             'knowledge_mid', 'salience_score', 'sentiment_score', 'sentiment_magnitude']
@@ -108,7 +171,12 @@ class DatabaseWrapper:
 
     def get_many_from_many(self, col_id, flag=''):
         """
-        Gets ___ from ___
+        Gets ___ from ___. Only for many to many relationships.
+            Ex: flag = 'person_topic'. Get person IDs from topic ID.
+        
+        Keyword arguments:
+        col_id -- The specific ID to query.
+        flag -- The specific many to many pair to get from.
         """
         if flag == 'person_topic':
             data = self.DB.select('person_topic', ['person_id', 'score'], ['topic_id'], ([col_id],))
@@ -136,9 +204,17 @@ class DatabaseWrapper:
         return data
         
     def get_many_from_one(self, col_id, flag=''):
-        if flag == 'speaker_person':
+        """
+        Gets ___ from ___. Only for one to many relationships.
+            Ex: flag = 'content_speaker'. Gets content IDs from speaker ID.
+        
+        Keyword arguments:
+        col_id -- The specific ID to query.
+        flag -- The specific many to many pair to get from.
+        """
+        if flag == 'content_speaker':
             data = self.DB.select('content', ['content_id'], ['speaker_id'], ([col_id],))
-        elif flag == 'addressee_person':
+        elif flag == 'content_addressee':
             data = self.DB.select('content', ['content_id'], ['addressee_id'], ([col_id],))
         elif flag == 'content_information':
             data = self.DB.select('content', ['content_id'], ['information_id'], ([col_id],))
@@ -148,19 +224,14 @@ class DatabaseWrapper:
             raise Exception('Need to select a flag')
         return data
 
-    def get_all(self, flag=''):
-        if flag == 'content':
-            data = self.DB.select('content', ['*'])
-        elif flag == 'information':
-            data = self.DB.select('information', ['*'])
-        elif flag == 'person':
-            data = self.DB.select('person', ['*'])
-        elif flag == 'topic':
-            data = self.DB.select('topic', ['*'])
-        elif flag == 'entities':
-            data = self.DB.select('entities', ['*'])
-        else:
-            raise Exception('Need to select a flag')
+    def get_all(self, table):
+        """
+        Gets all columns and rows from a table.
+        
+        Keyword arguments:
+        table -- The table name to select from.
+        """
+        data = self.DB.select(table, ['*'])
         return data
 
     def get_information_from_content(self, content_id):
@@ -173,6 +244,12 @@ class DatabaseWrapper:
         return self.DB.select('person', ['threshold_low', 'threshold_high'], ['person_id'], ([person_id],))[0]
 
     def get_sentiments(self, content_id):
+        """
+        Gets sentiment data for a specific content.
+        
+        Keyword arguments:
+        content_id -- The specific content ID to get metadata from.
+        """
         entities = self.get_many_from_one(content_id, 'entity_content')
         information_id = self.get_information_from_content(content_id)
         c_score, c_magnitude = self.DB.select('content', ['sentiment_score', 'sentiment_magnitude'], ['content_id'], ([content_id],))[0]
@@ -198,6 +275,12 @@ class DatabaseWrapper:
         return trusts
 
     def get_information_detail(self, content_id):
+        """
+        Gets conversation level and content level text from a content.
+        
+        Keyword arguments:
+        content_id -- The specific content ID to get metadata from.
+        """
         information_id = self.get_information_from_content(content_id)
         text = self.DB.select('content', ['text_content'], ['content_id'], ([content_id],))
         all_text = self.DB.select('content', ['text_content'], ['information_id'], ([information_id],))
@@ -210,6 +293,13 @@ class DatabaseWrapper:
         return self.DB.select('content', ['emotion'], ['content_id'], ([content_id]),)
 
     def get_peoples_conversations(self, truster_id, trustee_id):
+        """
+        Gets all the trust/relationship related metadata for a specific person pair.
+        
+        Keyword arguments:
+        truster_id -- The person doing the trusting.
+        trustee_id -- The person being trusted.
+        """
         text_content = []
         privacy_score = []
         control_level = []

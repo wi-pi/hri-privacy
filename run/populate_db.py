@@ -11,8 +11,8 @@ import os
 
 CONVERSATION = 3
 db = DatabaseWrapper()
-# db.delete()
-# db.create()
+db.delete()
+db.create()
 path = os.path.join('data', 'conversation{}'.format(CONVERSATION))
 text = ''
 texts = []

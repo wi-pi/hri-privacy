@@ -1,0 +1,2 @@
+CONVERT = {'non-domestic': ['doctor\'s office', 'office', 'courthouse', 'school graduation event', 'classroom', 'hospital elevator', 'production studio', 'medical lab', 'ticket booth', 'car shop', 'coffee shop', 'school choir room', 'gym', 'restaurant', 'public library', 'park', 'bar'],
+           'domestic': ['living room', 'kitchen', 'dining room', 'apartment', 'home', 'front yard', 'house', 'bedroom', 'university dorm', 'garage']}

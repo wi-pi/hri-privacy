@@ -12,15 +12,17 @@ class Google_NLP:
     """
     Google natural language API class. Can be used to get metadata such as entities, sentiments, and topics from a specified document.
     """
-    def __init__(self, text):
+    def __init__(self, text, verbose=True):
         self.client = language_v1.LanguageServiceClient()
         self.language = "en"
 
-        print("Text: {}".format(text))
+        if verbose:
+            print("Text: {}".format(text))
         self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)
 
-    def update_document(self, text):
-        print("Text: {}".format(text))
+    def update_document(self, text, verbose=True):
+        if verbose:
+            print("Text: {}".format(text))
         self.document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT, language=self.language)
         
     def get_sentiment(self):
@@ -99,7 +101,7 @@ class Text_Razor:
     def get_topic(self):
         for topic in self.topics:
             if topic.score > 0.3:
-                
+                pass
         return self.topics
 
     def get_sentiment(self):
@@ -112,21 +114,21 @@ class Text_Razor:
                      'type': 'idk',
                      'relevance': entity.relevance_score,
                      'mention_words': entity.matched_words}
-try:
-    manager.get_dictionary('names')
-except tr.TextRazorAnalysisException as e:
-    manager.create_dictionary({'names':'names123'})
+# try:
+#     manager.get_dictionary('names')
+# except tr.TextRazorAnalysisException as e:
+#     manager.create_dictionary({'names':'names123'})
 
-manager.add_entries('names', [{'Bob':'Bob'}, {'Misty':'Misty'}])
+# manager.add_entries('names', [{'Bob':'Bob'}, {'Misty':'Misty'}])
 
-path = os.path.join('data', 'conversation{}'.format(3))
-texts = []
-for num, file in enumerate(os.listdir(path)):
-    with open(os.path.join(path, '{}.txt'.format(num + 1)), 'r') as infile:
-        t = infile.read()
-        texts.append(t)
-t = Text_Razor()
-for i, text in enumerate(texts):
-    t.query(text)
-print(tr.AccountManager().get_account().requests_used_today)
+# path = os.path.join('data', 'conversation{}'.format(3))
+# texts = []
+# for num, file in enumerate(os.listdir(path)):
+#     with open(os.path.join(path, '{}.txt'.format(num + 1)), 'r') as infile:
+#         t = infile.read()
+#         texts.append(t)
+# t = Text_Razor()
+# for i, text in enumerate(texts):
+#     t.query(text)
+# print(tr.AccountManager().get_account().requests_used_today)
 # add dictionary support

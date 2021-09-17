@@ -1,0 +1,3 @@
+CONVERT = {'close': ['father', 'mother', 'sister', 'brother', 'son', 'daughter', 'grandmother', 'spouse', 'girlfriend', 'boyfriend', 'grandson', 'granddaughter'],
+           'moderate': ['doctor', 'patient', 'lawyer', 'friend', 'family friend', 'neighbor', 'nanny', 'roommate', 'date', ''],
+           'distant': ['manager', 'coworker', 'contact tracer', 'vice president', 'acquaintance', 'bailiff', 'prosecutor', 'supervisor', 'cashier', 'assistant', 'trainer', 'employee', 'librarian', 'student']}

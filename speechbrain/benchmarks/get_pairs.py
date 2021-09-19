@@ -159,6 +159,8 @@ def write_to_file(l1, l2, l3, fname):
 
 
 def plot_roc():
+    import seaborn as sns
+    sns.set_style("darkgrid")
     scores = np.load("vc1/scores.npy")
     n = scores.shape[0]
     scores = list(scores)
@@ -169,9 +171,10 @@ def plot_roc():
     roc_auc = metrics.auc(fpr, tpr)
 
     import matplotlib.pyplot as plt
-    plt.title('Receiver Operating Characteristic')
+    #plt.title('Receiver Operating Characteristic')
     plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
     plt.legend(loc = 'lower right')
+    plt.legend(frameon=False)
     plt.plot([0, 1], [0, 1],'r--')
     plt.xlim([0, 1])
     plt.ylim([0, 1])
@@ -187,6 +190,8 @@ def plot_roc():
     '''
 
 def custom_plot_roc():
+    import seaborn as sns
+    sns.set_style("darkgrid")
     t_scores = np.load("vc1/scores.npy")
     scores = np.load("vc1/scores.npy")
     n = scores.shape[0]
@@ -247,5 +252,5 @@ def check_inter_scores():
 if __name__ == "__main__":
     #main()
     plot_roc()
-    custom_plot_roc()
+    #custom_plot_roc()
     #check_inter_scores()

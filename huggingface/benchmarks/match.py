@@ -61,6 +61,7 @@ def save(scores, labels, sem_scores):
 def plot_roc(label_file = "labels.npy"):
     scores = np.load("scores.npy")
     n = scores.shape[0]
+    import seaborn as sns
     scores = list(scores)
     print(min(scores), max(scores))
     labels = list(np.load(label_file))
@@ -71,9 +72,11 @@ def plot_roc(label_file = "labels.npy"):
 
     import matplotlib.pyplot as plt
     plt.clf()
-    plt.title('Receiver Operating Characteristic')
+    sns.set_style("darkgrid")
+    #plt.title('Receiver Operating Characteristic')
     plt.plot(fpr, tpr, 'b', label = 'AUC = %0.2f' % roc_auc)
     plt.legend(loc = 'lower right')
+    plt.legend(frameon=False)
     plt.plot([0, 1], [0, 1],'r--')
     plt.xlim([0, 1])
     plt.ylim([0, 1])

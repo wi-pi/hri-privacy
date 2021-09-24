@@ -1,0 +1,12 @@
+realistic -- leave it
+sensitive -- leave it
+appropriate_share -- leave it
+privacy_violated -- leave it
+negative_consequences -- leave it
+comfortable -- leave it
+trust_share -- leave it
+
+close_comfortable -- invert
+distant_comfortable -- invert
+close_share -- leave it
+distant_share -- leave it

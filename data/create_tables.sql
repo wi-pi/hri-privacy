@@ -23,10 +23,13 @@ CREATE TABLE "public"."information"
  "information_id"      serial NOT NULL,
  "sentiment_score"     float NOT NULL,
  "sentiment_magnitude" float NOT NULL,
+ "sentiment_value"     text NOT NULL,
  "threshold_low"       float NOT NULL,
  "threshold_high"      float NOT NULL,
  "datetime"            timestamp NOT NULL,
  "eavesdropping"       boolean NOT NULL,
+ "location"            text NOT NULL,
+ "scenario_num"        integer NOT NULL,
  CONSTRAINT "PK_information" PRIMARY KEY ( "information_id" )
 );
 
@@ -41,6 +44,7 @@ CREATE TABLE "public"."content"
  "position"            integer NOT NULL,
  "sentiment_score"     float NOT NULL,
  "sentiment_magnitude" float NOT NULL,
+ "sentiment_value"     text NOT NULL,
  "privacy_score"       float NOT NULL,
  "datetime"            timestamp NOT NULL,
  "text_content"        text NOT NULL,
@@ -76,6 +80,7 @@ CREATE TABLE "public"."entities"
  "salience_score"      float NOT NULL,
  "sentiment_score"     float NOT NULL,
  "sentiment_magnitude" float NOT NULL,
+ "sentiment_value"     text NOT NULL,
  "representation"      text NOT NULL,
  "mention_text"        text NOT NULL,
  "type"                text NOT NULL,
@@ -118,10 +123,11 @@ CREATE INDEX "fkIdx_pi_information" ON "public"."person_information"
 
 CREATE TABLE "public"."person_trust"
 (
- "pt_id"      serial NOT NULL,
- "truster_id" integer NOT NULL,
- "trustee_id" integer NOT NULL,
- "trust"      float NOT NULL,
+ "pt_id"        serial NOT NULL,
+ "truster_id"   integer NOT NULL,
+ "trustee_id"   integer NOT NULL,
+ "trust"        float NOT NULL,
+ "relationship" text NOT NULL,
  UNIQUE ("truster_id", "trustee_id"),
  CONSTRAINT "PK_person_trust" PRIMARY KEY ( "pt_id" ),
  CONSTRAINT "FK_pt_truster_person" FOREIGN KEY ( "truster_id" ) REFERENCES "public"."person" ( "person_id" ),

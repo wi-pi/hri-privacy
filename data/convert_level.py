@@ -1,0 +1,1 @@
+CONVERT = {'low': 0.25, 'moderate': 0.5, 'high': 0.75}

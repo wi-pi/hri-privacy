@@ -1,0 +1,1 @@
+It's designed to photograph in 360 degrees. It scans in the image one line at a time. It takes about five minutes to complete one revolution.

@@ -3,6 +3,7 @@ from convert_topics import CONVERT
 import argparse
 import os
 import csv
+import numpy as np
 
 
 def parse(blob):
@@ -11,11 +12,11 @@ def parse(blob):
     confidences = []
     for e in elements:
         if "name" in e:
-            names.append(e.strip())
+            names.append(e.strip().split(':')[1].replace('"',''))
         if "confidence" in e:
-            confidences.append(e.strip())
+            confidences.append(float(e.strip().split(':')[1]))
 
-    print(names, confidences)
+    #print(names, confidences)
     return names, confidences
 
 def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matrix):
@@ -26,19 +27,21 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
         vals.append(d[k])
 
     for data in dataset:
+        print(data[1])
         nlp = Google_NLP(data[1], verbose=False)
         inferred_topic = str(nlp.get_topic())
-        infer_topics, confidence = parse(inferred_topic)
+        infer_topics, confidences = parse(inferred_topic)
         source_topic = classes[int(data[0])]
         n = len(infer_topics)
         for i in range(n):
             infer_topic = infer_topics[i]
             confidence = confidences[i]
-            infer_idx = inv_classes[infer_topic]
-            confusion_matrix[int(data[0])][infer_idx] += 1
-            if infer_topic not in vals:
+            if infer_topic not in inv_classes:
                 n = len(vals)
-                confusion_matrix[int(data[0])][n] += 1
+                confusion_matrix[int(data[0])][n-1] += 1
+            else:
+                infer_idx = inv_classes[infer_topic]
+                confusion_matrix[int(data[0])][infer_idx] += 1
     
     print(confusion_matrix)
     return confusion_matrix
@@ -49,7 +52,7 @@ def topic(data_path):
 
     dataset_name = data_path.split('/')[-1]
 
-    with open(os.path.join(datapath, 'classes.txt'), 'r') as infile:
+    with open(os.path.join(data_path, 'classes.txt'), 'r') as infile:
         i = 0
         for line in infile:
             t = line.strip()
@@ -59,7 +62,7 @@ def topic(data_path):
 
     confusion_matrix = np.zeros((i-1,i))
 
-    with open(os.path.join(datapath, 'test.csv'), 'r') as infile:
+    with open(os.path.join(data_path, 'test.csv'), 'r') as infile:
         reader = csv.reader(infile)
         data = []
         for row in reader:

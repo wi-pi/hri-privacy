@@ -1,5 +1,7 @@
 import os
 from jiwer import wer
+import numpy as np
+from tqdm import tqdm
 
 def transcribe_file(speech_file):
     """Transcribe the given audio file."""
@@ -18,6 +20,7 @@ def transcribe_file(speech_file):
 
     # Each result is for a consecutive portion of the audio. Iterate through
     # them to get the transcripts for the entire audio file.
+    output = None
     for result in response.results:
         # The first alternative is the most likely one for this portion.
         #print(u"Transcript: {}".format(result.alternatives[0].transcript))
@@ -80,7 +83,10 @@ if __name__ == "__main__":
     truth_dict = populate(files)
 
     error_list = []
-    for speech_file in files:
+    n = len(files)
+
+    for i in tqdm(range(n)):
+        speech_file = files[i]
         output = transcribe_file(speech_file)
         truth = obtain_truth(speech_file, truth_dict)
         if truth != None and output != None:
@@ -90,3 +96,10 @@ if __name__ == "__main__":
 
 
     print("AVG WER:", sum(error_list)/len(error_list))
+    
+    '''
+    error = np.asarray(error_list)
+    f = open('errors.npy', 'w')
+    np.save(f, error)
+    f.close()
+    '''

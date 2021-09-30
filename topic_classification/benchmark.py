@@ -19,7 +19,7 @@ def parse(blob):
     #print(names, confidences)
     return names, confidences
 
-def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matrix):
+def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matrix, label_counts):
     vals = []
     d = CONVERT[dataset_name]
     keys = list(d.keys())
@@ -27,28 +27,37 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
         vals.append(d[k])
 
     for data in dataset:
-        print(data[1])
         nlp = Google_NLP(data[1], verbose=False)
         inferred_topic = str(nlp.get_topic())
         infer_topics, confidences = parse(inferred_topic)
         source_topic = classes[int(data[0])]
         n = len(infer_topics)
+        l = data[2]
         for i in range(n):
             infer_topic = infer_topics[i]
             confidence = confidences[i]
             if infer_topic not in inv_classes:
                 n = len(vals)
-                confusion_matrix[int(data[0])][n-1] += 1
+                #print("1:", int(data[0]), n)
+                confusion_matrix[int(data[0])][n] += 1
             else:
                 infer_idx = inv_classes[infer_topic]
+                #print("2:",int(data[0]), infer_idx)
                 confusion_matrix[int(data[0])][infer_idx] += 1
     
+    keys = sorted(list(label_counts.keys()))
+    for k in keys:
+        v = label_counts[k]
+        confusion_matrix[k,:] = confusion_matrix[k,:]/v
+
     print(confusion_matrix)
+
     return confusion_matrix
 
 def topic(data_path):
     classes = {}
     inv_classes = {}
+    label_counts = {}
 
     dataset_name = data_path.split('/')[-1]
 
@@ -60,7 +69,7 @@ def topic(data_path):
             inv_classes[t] = i
             i = i + 1
 
-    confusion_matrix = np.zeros((i-1,i))
+    confusion_matrix = np.zeros((i,i+1))
 
     with open(os.path.join(data_path, 'test.csv'), 'r') as infile:
         reader = csv.reader(infile)
@@ -70,9 +79,16 @@ def topic(data_path):
             label = int(row[0]) - 1
             for i in range(1, len(row)):
                 text += row[i]
-            data.append((label, text))
-    
-    iterate_through(data, dataset_name, classes, inv_classes, confusion_matrix)
+            elements = text.split(' ')
+            if len(elements) > 50:
+                label = int(label)
+                data.append((label, text, len(elements)))
+                if label not in label_counts:
+                    label_counts[label] = 1
+                else:
+                    label_counts[label] += 1
+   
+    iterate_through(data, dataset_name, classes, inv_classes, confusion_matrix, label_counts)
 
 
 if __name__ == "__main__":

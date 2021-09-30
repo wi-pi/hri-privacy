@@ -8,6 +8,14 @@ from tqdm import tqdm
 
 CONVERT = {'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'], 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}}
 
+def joint_sort(list1, list2):
+    zipped_lists = zip(list1, list2)
+    sorted_pairs = sorted(zipped_lists)
+
+    tuples = zip(*sorted_pairs)
+    list1, list2 = [list(t) for t in tuples]
+    return list1, list2
+
 def parse(blob):
     elements = blob.split("\n")
     names = []
@@ -21,8 +29,9 @@ def parse(blob):
         if "confidence" in e:
             confidences.append(float(e.strip().split(':')[1]))
 
+    names, confidences = joint_sort(names, confidences)
     #print(names, confidences)
-    return names, confidences
+    return [names[-1]], [confidences[-1]]
 
 def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matrix, label_counts):
     vals = []
@@ -35,6 +44,8 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
         nlp = Google_NLP(data[1], verbose=False)
         inferred_topic = str(nlp.get_topic())
         infer_topics, confidences = parse(inferred_topic)
+        print(infer_topics, confidences)
+        exit()
         source_topic = classes[int(data[0])]
         n = len(infer_topics)
         l = data[2]

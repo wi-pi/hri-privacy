@@ -1,5 +1,3 @@
-CONVERT = {'ag_news': {},
-           'dbpedia': {},
-           'sogou_news': {},
-           'yahoo_answers': {'Society & Culture': ['People & Society'], 'Science & Mathematics': ['Science'], 'Health': ['Health'], 'Education & Reference': ['Jobs & Education', 'Books & Literature'], 'Computers & Internet': ['Computers & Electronics'], 'Sports': ['Sports'], 'Business & Finance': ['Finance', 'Business & Industrial'], 'Entertainment & Music': ['Arts & Entertainment'], 'Family & Relationships': ['People & Society'], 'Politics & Government': ['Law & Government']}
+CONVERT = {
+        'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'] 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}
 }

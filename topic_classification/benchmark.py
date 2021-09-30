@@ -1,10 +1,12 @@
 from natural_language import Google_NLP
-from convert_topics import CONVERT
+#from convert_topics import CONVERT
 import argparse
 import os
 import csv
 import numpy as np
+from tqdm import tqdm
 
+CONVERT = {'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'], 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}}
 
 def parse(blob):
     elements = blob.split("\n")
@@ -12,7 +14,10 @@ def parse(blob):
     confidences = []
     for e in elements:
         if "name" in e:
-            names.append(e.strip().split(':')[1].replace('"',''))
+            t = e.split('/')[1].replace('"','')
+            #print(e, t)
+            names.append(t)
+            #e.strip().split(':')[1].replace('"','').replace('/',' ').replace('\\',''))
         if "confidence" in e:
             confidences.append(float(e.strip().split(':')[1]))
 
@@ -24,9 +29,9 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
     d = CONVERT[dataset_name]
     keys = list(d.keys())
     for k in keys:
-        vals.append(d[k])
+        vals.append(d[k][0])
 
-    for data in dataset:
+    for _, data in tqdm(enumerate(dataset)):
         nlp = Google_NLP(data[1], verbose=False)
         inferred_topic = str(nlp.get_topic())
         infer_topics, confidences = parse(inferred_topic)
@@ -39,7 +44,7 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
             if infer_topic not in inv_classes:
                 n = len(vals)
                 #print("1:", int(data[0]), n)
-                confusion_matrix[int(data[0])][n] += 1
+                confusion_matrix[int(data[0])][n-1] += 1
             else:
                 infer_idx = inv_classes[infer_topic]
                 #print("2:",int(data[0]), infer_idx)
@@ -53,6 +58,10 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
     print(confusion_matrix)
 
     return confusion_matrix
+
+def flip(p):
+    import random
+    return True if random.random() < p else False
 
 def topic(data_path):
     classes = {}
@@ -81,12 +90,13 @@ def topic(data_path):
                 text += row[i]
             elements = text.split(' ')
             if len(elements) > 50:
-                label = int(label)
-                data.append((label, text, len(elements)))
-                if label not in label_counts:
-                    label_counts[label] = 1
-                else:
-                    label_counts[label] += 1
+                if flip(0.15) == True:
+                    label = int(label)
+                    data.append((label, text, len(elements)))
+                    if label not in label_counts:
+                        label_counts[label] = 1
+                    else:
+                        label_counts[label] += 1
    
     iterate_through(data, dataset_name, classes, inv_classes, confusion_matrix, label_counts)
 

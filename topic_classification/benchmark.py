@@ -1,12 +1,13 @@
 from natural_language import Google_NLP
-#from convert_topics import CONVERT
+from convert_topics import CONVERT
 import argparse
 import os
 import csv
 import numpy as np
 from tqdm import tqdm
 
-CONVERT = {'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'], 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}}
+#CONVERT = {'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'], 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}}
+
 
 def joint_sort(list1, list2):
     zipped_lists = zip(list1, list2)
@@ -29,9 +30,13 @@ def parse(blob):
         if "confidence" in e:
             confidences.append(float(e.strip().split(':')[1]))
 
-    names, confidences = joint_sort(names, confidences)
-    #print(names, confidences)
-    return [names[-1]], [confidences[-1]]
+    l_n, l_c = len(names), len(confidences)
+    if l_n > 0 and l_c > 0:
+        names, confidences = joint_sort(names, confidences)
+        #print(names, confidences)
+        return [names[-1]], [confidences[-1]]
+    else:
+        return None, None
 
 def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matrix, label_counts):
     vals = []
@@ -40,33 +45,62 @@ def iterate_through(dataset, dataset_name, classes, inv_classes, confusion_matri
     for k in keys:
         vals.append(d[k][0])
 
-    for _, data in tqdm(enumerate(dataset)):
+    len_d = {}
+
+    M = len(dataset)
+    returned_list = []
+    for i in tqdm(range(M)):
+        data = dataset[i]
         nlp = Google_NLP(data[1], verbose=False)
         inferred_topic = str(nlp.get_topic())
         infer_topics, confidences = parse(inferred_topic)
-        print(infer_topics, confidences)
-        exit()
-        source_topic = classes[int(data[0])]
-        n = len(infer_topics)
-        l = data[2]
-        for i in range(n):
-            infer_topic = infer_topics[i]
-            confidence = confidences[i]
-            if infer_topic not in inv_classes:
-                n = len(vals)
-                #print("1:", int(data[0]), n)
-                confusion_matrix[int(data[0])][n-1] += 1
-            else:
-                infer_idx = inv_classes[infer_topic]
-                #print("2:",int(data[0]), infer_idx)
-                confusion_matrix[int(data[0])][infer_idx] += 1
+        #print(infer_topics, confidences)
+        #exit()
+
+
+        if infer_topics != None and confidences != None:
+            source_topic = classes[int(data[0])]
+            N = len(infer_topics)
+            l = data[2]
+            for i in range(N):
+                infer_topic = infer_topics[i]
+                returned_list.append(infer_topic)
+                confidence = confidences[i]
+                if infer_topic in d:
+                    infer_topic_vals = d[infer_topic]
+                    if source_topic in infer_topic_vals:
+                        n = len(vals)
+                        #print("1:", int(data[0]), n)
+                        #confusion_matrix[int(data[0])][n-1] += 1
+                        confusion_matrix[int(data[0])][int(data[0])] += 1
+                    else:
+                        #infer_idx = inv_classes[infer_topic]
+                        #print("2:",int(data[0]), infer_idx)
+                        infer_idx = inv_classes[infer_topic_vals[0]]
+                        confusion_matrix[int(data[0])][infer_idx] += 1
+                else:
+                    confusion_matrix[int(data[0])][n-1] += 1
+                
+                if int(data[0]) not in len_d:
+                    len_d[int(data[0])] = 1
+                else:
+                    len_d[int(data[0])] += 1
+
+    returned_list = list(set(returned_list))
     
-    keys = sorted(list(label_counts.keys()))
+
+    keys = sorted(list(len_d.keys()))
     for k in keys:
-        v = label_counts[k]
+        v = len_d[k]
         confusion_matrix[k,:] = confusion_matrix[k,:]/v
 
     print(confusion_matrix)
+
+    f = open('returned_labels.txt', 'w')
+    for e in returned_list:
+        f.write(e + "\n")
+
+    f.close()
 
     return confusion_matrix
 
@@ -109,7 +143,9 @@ def topic(data_path):
                     else:
                         label_counts[label] += 1
    
-    iterate_through(data, dataset_name, classes, inv_classes, confusion_matrix, label_counts)
+    c_matrix = iterate_through(data, dataset_name, classes, inv_classes, confusion_matrix, label_counts)
+    with open('confusion_matrix.npy', 'wb') as f:
+        np.save(f, c_matrix)
 
 
 if __name__ == "__main__":

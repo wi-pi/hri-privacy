@@ -1,3 +1,33 @@
-CONVERT = {
-        'yahoo_answers': {'People & Society': ['Society & Culture', 'Family & Relationships'], 'Science': ['Science & Mathematics'], 'Health': ['Health'], 'Jobs & Education': ['Education & Reference'], 'Books & Literature': ['Education & Reference'], 'Computers & Electronics': ['Computers & Internet'] 'Sports': ['Sports'], 'Finance': ['Business & Finance'], 'Business & Industrial': ['Business & Finance'], 'Arts & Entertainment': ['Entertainment & Music'], 'Law & Government': ['Politics & Government']}
+CONVERT = {'ag_news': {},
+           'dbpedia': {},
+           'sogou_news': {},
+           'yahoo_answers': {
+               'People & Society': ['Society & Culture', 'Family & Relationships'],
+               'Science': ['Science & Mathematics', 'Education & Reference'],
+               'Health': ['Health'],
+               'Jobs & Education': ['Education & Reference'],
+               'Books & Literature': ['Education & Reference'],
+               'Computers & Electronics': ['Computers & Internet'],
+               'Sports': ['Sports'],
+               'Finance': ['Business & Finance'],
+               'Business & Industrial': ['Business & Finance'],
+               'Arts & Entertainment': ['Entertainment & Music'],
+               'Law & Government': ['Politics & Government'],
+               'Internet & Telecom': ['Computers & Internet'],
+               'Travel': ['Society & Culture'],
+               'Home & Garden': ['Society & Culture', 'Family & Relationships'],
+               'Hobbies & Leisure': ['Society & Culture', 'Entertainment & Music'],
+               'News': ['Society & Culture', 'Politics & Government', 'Education & Reference'],
+               'Pets & Animals': ['Society & Culture', 'Entertainment & Music'],
+               'Online Communities': ['Society & Culture', 'Computers & Internet'],
+               'Beauty & Fitness': ['Society & Culture', 'Sports'],
+               'Shopping': ['Society & Culture'],
+               'Sensitive Subjects': ['Society & Culture', 'Family & Relationships'],
+               'Autos & Vehicles': ['Society & Culture', 'Sports'],
+               'Food & Drink': ['Society & Culture', 'Entertainment & Music'],
+               'Adult': ['Society & Culture', 'Family & Relationships'],
+               'Real Estate': ['Business & Finance'],
+               'Reference': ['Education & Reference'],
+               'Games': ['Entertainment & Music']
+            }
 }

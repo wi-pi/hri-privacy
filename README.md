@@ -11,6 +11,10 @@ pip install -r requirements.txt
 sudo nano /etc/postgresql/12/main/postgresql.conf        # Change listen_addresses to *
 ```
 
+### Downloads
+
+https://drive.google.com/drive/folders/1xVDdxbKGKkTxg2L0owTH8siBD5GHLCXA?usp=sharing
+
 ## Development
 ### Populating Database With Conversations
 - Add conversation samples to `data` and `data/metadata`.

@@ -1,3 +1,14 @@
 __pycache__/
 socionormbot.egg-info/
 data/scripts.json
+unused/
+SENSITIVE/
+# data/audio_files/
+# data/text_classification/ag_news/
+# data/text_classification/dbpedia/
+# data/text_classification/sogou_news/
+# data/text_classification/yahoo_answers/
+# data/sentiment_analysis/
+# data/movie_scripts/scripts.json
+# data/movie_scripts/conversation_dump/
+data/
